@@ -1,0 +1,19 @@
+.black{
+    background-color: black;
+}
+.red{
+    background-color: red;
+}
+#container{
+    height: 80vw;
+    width: 80vw;
+}
+.cell{
+    height: 10vw;
+    width: 10vw;
+    display: inline-block;
+}
+.img-size{
+    height: 10vw;
+    width: 10vw;
+}
