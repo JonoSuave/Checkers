@@ -48,13 +48,14 @@ function pieceBuilder(i){
 
 function makeCheckerImg(i,woo){
     if(i<3){
-        var blackCheckerImg = $("<img />").attr("src","images/black.png");
-        $(blackCheckerImg).addClass('img-size');
-       $(woo).append(blackCheckerImg); 
+        var blackCheckerImg = $(woo).addClass('black-checker-img');
+//            $("<img />").attr("src","images/black.png");
+//        $(blackCheckerImg).addClass('img-size');
+//       $(woo).append(blackCheckerImg); 
+        
+        
     }else if (i>4){
-        var redCheckerImg = $("<img />").attr("src","images/red.png");
-        $(redCheckerImg).addClass('img-size');
-        $(woo).append(redCheckerImg); 
+        var redCheckerImg = $(woo).addClass('red-checker-img'); 
     }
 }
 
@@ -78,8 +79,23 @@ function getCoordinates(id){
     return coord;
 }
 
-function detectMoves(id) {
-    if
+function detectChecker(id) {
+    var cell = $("#"+id);
+    if($(cell).hasClass("black-checker-img") === true){
+       detectMoves(id,cell);
+       }
+    
+}
+
+function detectMoves(id,cell){
+    var eleven = "11";
+    var idNum11 = parseInt(id+eleven);
+    var possibleCell11 = idNum11.toString();
+    
+    if($('#'+possibleCell11).hasClass("black-checker-img") != true){
+//        Can move if empty square is clicked on
+        
+    } 
 }
 
 
@@ -91,6 +107,6 @@ $(document).ready(function(){
     $('.cell').click(function(){
         var id= $(this).attr('id');
         var coordinates = getCoordinates(id);
-        detectMoves(id);
+        detectChecker(id);
     });
 });
