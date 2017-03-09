@@ -83,7 +83,7 @@ function detectChecker(id) {
     var cell = $("#"+id);
     if($(cell).hasClass("black-checker-img") === true){
        detectMoves(id,cell);
-       }
+    }
     
 }
 
@@ -93,20 +93,58 @@ function detectMoves(id,cell){
     var possibleCell11 = idNum11.toString();
     
     if($('#'+possibleCell11).hasClass("black-checker-img") != true){
-//        Can move if empty square is clicked on
+        if(firstActive === true){
+            
+        }
+//        Can move if empty square is clicked on. Idea: When a cell is clicked, see if another cell has been activated already (with a flag). If yes, then move the image to cell and delete it from the other cell.
         
     } 
 }
+
 
 
 $(document).ready(function(){
     createCheckerSquares();
     var blackTurn = true;
     var redTurn = false;
+    var firstActive = false;
 
     $('.cell').click(function(){
         var id= $(this).attr('id');
-        var coordinates = getCoordinates(id);
-        detectChecker(id);
+        activeCell(id);
+//        var coordinates = getCoordinates(id);
+//        detectChecker(id);
     });
+//    Helper functions
+    function activeCell(id) {
+        if(firstActive === false) {
+            firstActive = true;
+            $("#"+id).addClass('highlight');
+        }else if(firstActive === true) {
+            canCheckerMoveHere(id);
+        }
+        return firstActive;
+    }
+
+    function canCheckerMoveHere(elId){
+        var cell = $("#"+elId);
+        var valid = function validMove(elId, cell);
+        if($(cell).hasClass("black-checker-img") != true){
+            $(cell).addClass("black-checker-img"); $('#container').find('.highlight').removeClass('black-checker-img highlight');
+        }else if($(cell).hasClass("black-checker-img") === true){
+            alert("No friendly fire allowed here");
+        }
+
+    }
+    
+    function validMove(elId, cellEl){
+        var possibilities = {
+            negEleven: parseInt(elId + "-11"),
+            possEleven: negEleven.toString(),
+        }
+        if($(cellEl).hasClass("black-checker-img") != true && $("#"+possibilities.possEleven).hasClass("highlight") === true){
+            return true;
+        }else if()
+//        if(possibilities.possEleven)
+    }
 });
