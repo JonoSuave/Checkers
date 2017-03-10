@@ -128,11 +128,11 @@ $(document).ready(function(){
 
     function canCheckerMoveHere(elId){
         var cell = $("#"+elId);
-        var valid = function validMove(elId, cell);
-        if($(cell).hasClass("black-checker-img") != true){
+        var valid = validMove(elId, cell);
+        if(valid === true){
             $(cell).addClass("black-checker-img"); $('#container').find('.highlight').removeClass('black-checker-img highlight');
-        }else if($(cell).hasClass("black-checker-img") === true){
-            alert("No friendly fire allowed here");
+        }else if(valid === false){
+            alert("No can do-ey mate");
         }
 
     }
@@ -141,10 +141,16 @@ $(document).ready(function(){
         var possibilities = {
             negEleven: parseInt(elId + "-11"),
             possEleven: negEleven.toString(),
+            negNine: parseInt(elId + "-9"),
+            possNine: negNine.toString()
         }
-        if($(cellEl).hasClass("black-checker-img") != true && $("#"+possibilities.possEleven).hasClass("highlight") === true){
+        if($(cellEl).hasClass("black-checker-img") != true && $("#"+possibilities.possEleven).hasClass("highlight") === true || $("#"+possibilities.possNine).hasClass("highlight")){
             return true;
-        }else if()
+        }else if($(cellEl).hasClass("black-checker-img") === true) {
+            return false;
+        }else if($(cellEl).hasClass("black-checker-img") != true && ($("#"+possibilities.possEleven).hasClass("highlight") != true && $("#"+possibilities.possEleven).hasClass("red-checker-img") || $("#"+possibilities.possNine).hasClass("highlight") != true && $("#"+possibilities.possEleven).hasClass("red-checker-img") != true)) {
+            return false;
+        }
 //        if(possibilities.possEleven)
     }
 });
