@@ -138,11 +138,15 @@ $(document).ready(function(){
     }
     
     function validMove(elId, cellEl){
+        var negativeEleven = parseInt(elId - 11);
+        var possibleEleven = negativeEleven.toString();
+        var negativeNine = parseInt(elId - 9);
+        var possibleNine = negativeNine.toString()
         var possibilities = {
-            negEleven: parseInt(elId + "-11"),
-            possEleven: negEleven.toString(),
-            negNine: parseInt(elId + "-9"),
-            possNine: negNine.toString()
+            negEleven: negativeEleven,
+            possEleven: possibleEleven,
+            negNine: negativeEleven,
+            possNine: possibleNine
         }
         if($(cellEl).hasClass("black-checker-img") != true && $("#"+possibilities.possEleven).hasClass("highlight") === true || $("#"+possibilities.possNine).hasClass("highlight")){
             return true;
