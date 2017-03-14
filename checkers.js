@@ -87,26 +87,12 @@ function detectChecker(id) {
     
 }
 
-function detectMoves(id,cell){
-    var eleven = "11";
-    var idNum11 = parseInt(id+eleven);
-    var possibleCell11 = idNum11.toString();
-    
-    if($('#'+possibleCell11).hasClass("black-checker-img") != true){
-        if(firstActive === true){
-            
-        }
-//        Can move if empty square is clicked on. Idea: When a cell is clicked, see if another cell has been activated already (with a flag). If yes, then move the image to cell and delete it from the other cell.
-        
-    } 
-}
-
-
 
 $(document).ready(function(){
     createCheckerSquares();
     var blackTurn = true;
     var redTurn = false;
+    var turn = "black"    
     var firstActive = false;
 
     $('.cell').click(function(){
@@ -120,8 +106,16 @@ $(document).ready(function(){
         if(firstActive === false) {
             firstActive = true;
             $("#"+id).addClass('highlight');
-        }else if(firstActive === true) {
-            canCheckerMoveHere(id);
+        }else if(firstActive === true && turn === "black" && canCheckerMoveHere(id)) {
+            firstActive = false;
+            colorTurn();
+        }else if(firstActive === true && turn === "red" && canCheckerMoveHere(id)) {
+            firstActive = false;
+            colorTurn();
+        }else if(firstActive) {
+            $('#container').find('.highlight').removeClass('highlight');
+            firstActive = false;
+            //what to do if they can't move
         }
         return firstActive;
     }
@@ -141,20 +135,52 @@ $(document).ready(function(){
         var negativeEleven = parseInt(elId - 11);
         var possibleEleven = negativeEleven.toString();
         var negativeNine = parseInt(elId - 9);
-        var possibleNine = negativeNine.toString()
+        var possibleNine = negativeNine.toString();
+        var positiveEleven = parseInt(elId + 11);
+        var redEleven = positiveEleven.toString();
+        var positiveNine = parseInt(elId + 9);
+        var redNine = positiveNine.toString();
         var possibilities = {
             negEleven: negativeEleven,
             possEleven: possibleEleven,
             negNine: negativeEleven,
-            possNine: possibleNine
+            possNine: possibleNine,
+            redEleven: redEleven,
+            redNine: redNine
         }
-        if($(cellEl).hasClass("black-checker-img") != true && $("#"+possibilities.possEleven).hasClass("highlight") === true || $("#"+possibilities.possNine).hasClass("highlight")){
+        if(turn === "black") {
+            return blackValidation(cellEl, possibilities); 
+        }else if(turn === "red"){
+            return redValidation(cellEl, possibilities);
+        }
+    }
+    
+    function blackValidation(clickedCell, objPoss) {
+        if($(clickedCell).hasClass("black-checker-img") != true && $("#"+objPoss.possEleven).hasClass("highlight") === true || $("#"+objPoss.possNine).hasClass("highlight")){
             return true;
-        }else if($(cellEl).hasClass("black-checker-img") === true) {
+        }else if($(clickedCell).hasClass("black-checker-img") === true) {
             return false;
-        }else if($(cellEl).hasClass("black-checker-img") != true && ($("#"+possibilities.possEleven).hasClass("highlight") != true && $("#"+possibilities.possEleven).hasClass("red-checker-img") || $("#"+possibilities.possNine).hasClass("highlight") != true && $("#"+possibilities.possEleven).hasClass("red-checker-img") != true)) {
+        }else if($(clickedCell).hasClass("black-checker-img") != true && ($("#"+objPoss.possEleven).hasClass("highlight") != true && $("#"+objPoss.possEleven).hasClass("red-checker-img") || $("#"+objPoss.possNine).hasClass("highlight") != true && $("#"+objPoss.possEleven).hasClass("red-checker-img") != true)) {
             return false;
         }
-//        if(possibilities.possEleven)
+    }
+    
+    function redValidation(cellClicked, possObj) {
+        if($(cellClicked).hasClass("red-checker-img") != true && $("#" + possObj.redEleven).hasClass("highlight") === true || $("#" + possObj.redNine).hasClass("highlight")) {
+            return true;
+        } else if($(cellClicked).hasClass("red-checker-img") === true) {
+            return false;
+        } else if($(cellClicked).hasClass("red-checker-img") != true && ($("#" + possObj.redEleven).hasClass("red-checker-img") || $("#" + possObj.redNine).hasClass("red-checker-img") != true && $("#" + possObj.redEleven).hasClass("red-checker-img") != true)) {
+            return false;
+        }
+    }
+    
+    function colorTurn() {
+        if(turn === "black") {
+            turn = "red";
+        }else if(turn === "red") {
+            turn = "black"; 
+        }
+        return turn
     }
 });
