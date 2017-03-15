@@ -124,53 +124,44 @@ $(document).ready(function(){
         var cell = $("#"+elId);
         var valid = validMove(elId, cell);
         if(valid === true){
-            $(cell).addClass("black-checker-img"); $('#container').find('.highlight').removeClass('black-checker-img highlight');
+            $(cell).addClass(turn + "-checker-img"); $('#container').find('.highlight').removeClass(turn + '-checker-img highlight');
         }else if(valid === false){
             alert("No can do-ey mate");
         }
-
+        return valid;
     }
     
     function validMove(elId, cellEl){
         var negativeEleven = parseInt(elId - 11);
         var possibleEleven = negativeEleven.toString();
-        var negativeNine = parseInt(elId - 9);
+        var negativeNine = parseInt(+elId - 9);
         var possibleNine = negativeNine.toString();
-        var positiveEleven = parseInt(elId + 11);
+        var positiveEleven = parseInt(+elId + 11);
         var redEleven = positiveEleven.toString();
-        var positiveNine = parseInt(elId + 9);
+        var positiveNine = parseInt(+elId + 9);
         var redNine = positiveNine.toString();
         var possibilities = {
-            negEleven: negativeEleven,
-            possEleven: possibleEleven,
-            negNine: negativeEleven,
-            possNine: possibleNine,
+            blackEleven: negativeEleven,
+            blackEleven: possibleEleven,
+            blackNine: negativeEleven,
+            blackNine: possibleNine,
             redEleven: redEleven,
             redNine: redNine
         }
         if(turn === "black") {
-            return blackValidation(cellEl, possibilities); 
+            return validation(cellEl, possibilities); 
         }else if(turn === "red"){
-            return redValidation(cellEl, possibilities);
+            return validation(cellEl, possibilities);
         }
     }
     
-    function blackValidation(clickedCell, objPoss) {
-        if($(clickedCell).hasClass("black-checker-img") != true && $("#"+objPoss.possEleven).hasClass("highlight") === true || $("#"+objPoss.possNine).hasClass("highlight")){
+    function validation(clickedCell, objPoss) {
+        if($(clickedCell).hasClass(turn + "-checker-img") != true &&
+            $("#"+objPoss[turn+"Eleven"]).hasClass("highlight") === true || $("#"+objPoss[turn+"Nine"]).hasClass("highlight")){
             return true;
-        }else if($(clickedCell).hasClass("black-checker-img") === true) {
+        }else if($(clickedCell).hasClass(turn + "-checker-img") === true) {
             return false;
-        }else if($(clickedCell).hasClass("black-checker-img") != true && ($("#"+objPoss.possEleven).hasClass("highlight") != true && $("#"+objPoss.possEleven).hasClass("red-checker-img") || $("#"+objPoss.possNine).hasClass("highlight") != true && $("#"+objPoss.possEleven).hasClass("red-checker-img") != true)) {
-            return false;
-        }
-    }
-    
-    function redValidation(cellClicked, possObj) {
-        if($(cellClicked).hasClass("red-checker-img") != true && $("#" + possObj.redEleven).hasClass("highlight") === true || $("#" + possObj.redNine).hasClass("highlight")) {
-            return true;
-        } else if($(cellClicked).hasClass("red-checker-img") === true) {
-            return false;
-        } else if($(cellClicked).hasClass("red-checker-img") != true && ($("#" + possObj.redEleven).hasClass("red-checker-img") || $("#" + possObj.redNine).hasClass("red-checker-img") != true && $("#" + possObj.redEleven).hasClass("red-checker-img") != true)) {
+            }else if($(clickedCell).hasClass(turn + "-checker-img") != true && ($("#"+objPoss[turn+"Eleven"]).hasClass("highlight") != true && $("#"+objPoss[turn+"Eleven"]).hasClass(turn + "-checker-img") || $("#"+objPoss[turn+"Nine"]).hasClass("highlight") != true && $("#"+objPoss[turn+"Eleven"]).hasClass(turn + "-checker-img") != true)) {
             return false;
         }
     }
