@@ -161,13 +161,17 @@ $(document).ready(function(){
     }
     
     function canSecondJumpValidation(elementClicked, possibility, enemyColor) {
-        var eighteen = $(twoCharacterId(possibility[turn + "18"]));
-        var nine = $(twoCharacterId(possibility[turn + "9"]));
-        var twentyTwo = $(twoCharacterId(possibility[turn + "22"]));
-        var eleven = $(twoCharacterId(possibility[turn + "11"]));
-        if(isPossibleSquareOnBoard(eighteen).hasClass(turn + "-checker-img") && enemyPiece(nine, enemyColor) && isBlankSquare(eighteen, enemyColor) {
+//        var eighteen = $(twoCharacterId(possibility[turn + "18"]));
+//        var nine = $(twoCharacterId(possibility[turn + "9"]));
+//        var twentyTwo = $(twoCharacterId(possibility[turn + "22"]));
+//        var eleven = $(twoCharacterId(possibility[turn + "11"]));
+        var eighteen = twoCharacterId(possibility[turn + "18"]);
+        var nine = twoCharacterId(possibility[turn + "9"]);
+        var twentyTwo = twoCharacterId(possibility[turn + "22"]);
+        var eleven = twoCharacterId(possibility[turn + "11"]);
+        if($(isPossibleSquareOnBoard(eighteen)).hasClass(turn + "-checker-img") && $(enemyPiece(nine, enemyColor)) && $(isBlankSquare(eighteen, enemyColor))) {
             return true;
-        }else if(!$(twoCharacterId(possibility[turn + "22"])).hasClass(turn + "-checker-img")  && !$(twoCharacterId(possibility[turn + "22"])).hasClass(enemyColor + "-checker-img")  && $$(twoCharacterId(possibility[turn + "11"])).hasClass(enemyColor + "-checker-img") === true){
+       }else if(!$(isPossibleSquareOnBoard(twentyTwo)).hasClass(turn + "-checker-img") && $(enemyPiece(eleven, enemyColor)) && $(isBlankSquare(twentyTwo, enemyColor))) {
             return true;
         }
         else{
@@ -182,20 +186,23 @@ $(document).ready(function(){
     }
     
     function enemyPiece(possibleNum, enemyColor) {
-        if(possibleNum.hasClass(enemyColor + "-checker-img")){
+        if($(possibleNum).hasClass(enemyColor + "-checker-img")){
             return true;
         }
     }
     
     function isBlankSquare(possibleNum, enemyColor) {
-        if(!possibleNum.hasClass(turn + "-checker-img") && !possibleNum.hasClass(enemyColor + "-checker-img"))
+        if(!$(possibleNum).hasClass(turn + "-checker-img") && !$(possibleNum).hasClass(enemyColor + "-checker-img")) {
+            return true;
+        }
     }
     
     function twoCharacterId(num) {
-        if(num.length === 1){
-            num = '0' + num;
+        var stringToNum = +num;
+        if(stringToNum.length === 1){
+            stringToNum = '0' + stringToNum;
         }
-        return '#' + num;
+        return '#' + stringToNum;
     }
     
     function slide(elId) {
