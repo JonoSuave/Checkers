@@ -161,17 +161,13 @@ $(document).ready(function(){
     }
     
     function canSecondJumpValidation(elementClicked, possibility, enemyColor) {
-//        var eighteen = $(twoCharacterId(possibility[turn + "18"]));
-//        var nine = $(twoCharacterId(possibility[turn + "9"]));
-//        var twentyTwo = $(twoCharacterId(possibility[turn + "22"]));
-//        var eleven = $(twoCharacterId(possibility[turn + "11"]));
         var eighteen = twoCharacterId(possibility[turn + "18"]);
         var nine = twoCharacterId(possibility[turn + "9"]);
         var twentyTwo = twoCharacterId(possibility[turn + "22"]);
         var eleven = twoCharacterId(possibility[turn + "11"]);
-        if($(isPossibleSquareOnBoard(eighteen)).hasClass(turn + "-checker-img") && $(enemyPiece(nine, enemyColor)) && $(isBlankSquare(eighteen, enemyColor))) {
+        if(isPossibleSquareOnBoard(eighteen) && enemyPiece(nine, enemyColor) && isBlankSquare(eighteen, enemyColor)) {
             return true;
-       }else if(!$(isPossibleSquareOnBoard(twentyTwo)).hasClass(turn + "-checker-img") && $(enemyPiece(eleven, enemyColor)) && $(isBlankSquare(twentyTwo, enemyColor))) {
+       }else if(isPossibleSquareOnBoard(twentyTwo) && enemyPiece(eleven, enemyColor) && isBlankSquare(twentyTwo, enemyColor)) {
             return true;
         }
         else{
@@ -180,19 +176,19 @@ $(document).ready(function(){
     }
     
     function isPossibleSquareOnBoard(possibleNum) {
-        if(possibleNum.charAt(0) >= 0 & possibleNum.charAt(1) < 8) {
+        if(possibleNum.charAt(0) >= 0 && possibleNum.charAt(0) < 8 && possibleNum.charAt(1) < 8) {
             return true;
         }
     }
     
     function enemyPiece(possibleNum, enemyColor) {
-        if($(possibleNum).hasClass(enemyColor + "-checker-img")){
+        if($('#' + possibleNum).hasClass(enemyColor + "-checker-img")){
             return true;
         }
     }
     
     function isBlankSquare(possibleNum, enemyColor) {
-        if(!$(possibleNum).hasClass(turn + "-checker-img") && !$(possibleNum).hasClass(enemyColor + "-checker-img")) {
+        if(!$('#' + possibleNum).hasClass(turn + "-checker-img") && !$('#' + possibleNum).hasClass(enemyColor + "-checker-img")) {
             return true;
         }
     }
@@ -202,7 +198,7 @@ $(document).ready(function(){
         if(stringToNum.length === 1){
             stringToNum = '0' + stringToNum;
         }
-        return '#' + stringToNum;
+        return '' + stringToNum;
     }
     
     function slide(elId) {
