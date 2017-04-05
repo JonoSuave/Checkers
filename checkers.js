@@ -79,48 +79,38 @@ function getCoordinates(id){
     return coord;
 }
 
-function detectChecker(id) {
-    var cell = $("#"+id);
-    if($(cell).hasClass("black-checker-img") === true){
-       detectMoves(id,cell);
-    }
-    
-}
-
 
 $(document).ready(function(){
     createCheckerSquares();
-    var blackTurn = true;
-    var redTurn = false;
     var turn = "black";
     var firstActive = false;
 
     $('.cell').click(function(){
-        var id= $(this).attr('id');
-        var enemyColor = turn === 'black'?'red' : 'black';
-        activeCell(id, enemyColor);
+        var id = $(this).attr('id');
+        var enemyColor = turn === 'black' ? 'red' : 'black';
+        activateCell(id, enemyColor);
 //        var coordinates = getCoordinates(id);
-//        detectChecker(id);
     });
 //    Helper functions
-    function activeCell(id, enemyColor) {
-        if(firstActive === false) {
+    function activateCell(id, enemyColor) {
+        if(!firstActive) {
             firstActive = true;
             $("#"+id).addClass('highlight');
-        }else if(firstActive === true) {
-            if (canCheckerMoveHere(id,enemyColor) === "slide") {
+        }else if(firstActive) {
+            
+            if (canSlideHere(id, enemyColor)) {
                 slide(id);
                 firstActive = false;
-                colorTurn();
-            } else if(canCheckerMoveHere(id, enemyColor) === enemyColor) {
+                endTurn();
+            } else if(canCheckerJump($("#" + id), generatePossibilities(id), enemyColor)) {
                 jumpEnemy(id, enemyColor);
                 firstActive = false;
-                if (secondJumpCheck(id, enemyColor) != true){
-                    colorTurn();
+                if(!canJumpAgain(id, enemyColor)){
+                    endTurn();
                 }
-            }else {  
-                
-                alert("No can do-ey mate");                $('#container').find('.highlight').removeClass('highlight');
+            }
+            else {  
+                alert("No can do-ey mate");               $('#container').find('.highlight').removeClass('highlight');
                 firstActive = false;
                 //what to do if they can't move
             }
@@ -128,77 +118,52 @@ $(document).ready(function(){
         return firstActive;
     }
     
-    function secondJumpCheck(clickedId, oppoColor){
-//        Can it jump again?
-        var cell = $("#" + clickedId);
-        return checkSecondMove(clickedId, cell, oppoColor);
-    }
-    
-    function checkSecondMove(idClicked, idElement, oppoColor) {
-        var blackNine = parseInt(+idClicked + 9).toString();
-        var blackEleven = parseInt(+idClicked + 11).toString();
-        var redNine = parseInt(+idClicked - 9).toString();
-        var redEleven = parseInt(+idClicked - 11).toString();
-        var blackEighteen = parseInt(+idClicked + 18).toString();
-        var blackTwentyTwo = parseInt(+idClicked + 22).toString();
-        var redEighteen = parseInt(+idClicked - 18).toString();
-        var redTwentyTwo = parseInt(+idClicked - 22).toString();
-        var possibilities = {
-            black9: blackNine,
-            black11: blackEleven,
-            black18: blackEighteen,
-            black22: blackTwentyTwo,
-            red9: redNine,
-            red11: redEleven,
-            red18: redEighteen,
-            red22: redTwentyTwo
-        }
-        if(turn === "black") {
-            return canSecondJumpValidation(idElement, possibilities, oppoColor); 
-        }else if(turn === "red"){
-            return canSecondJumpValidation(idElement, possibilities, oppoColor);
-        }
-    }
-    
-    function canSecondJumpValidation(elementClicked, possibility, enemyColor) {
-        var eighteen = twoCharacterId(possibility[turn + "18"]);
-        var nine = twoCharacterId(possibility[turn + "9"]);
-        var twentyTwo = twoCharacterId(possibility[turn + "22"]);
-        var eleven = twoCharacterId(possibility[turn + "11"]);
-        if(isPossibleSquareOnBoard(eighteen) && enemyPiece(nine, enemyColor) && isBlankSquare(eighteen, enemyColor)) {
+    function canJumpAgain(clickedId, enemyColor) {
+        var elementClicked = $("#" + clickedId);
+        var leftId = turn === 'black' ? twoCharacterId(+clickedId + 22) : twoCharacterId(+clickedId - 18);
+        var rightId = turn === 'black' ? twoCharacterId(+clickedId + 18) : twoCharacterId(+clickedId - 22);
+        if(canJumpTo(leftId, enemyColor)) {
             return true;
-       }else if(isPossibleSquareOnBoard(twentyTwo) && enemyPiece(eleven, enemyColor) && isBlankSquare(twentyTwo, enemyColor)) {
+        }else if(canJumpTo(rightId, enemyColor)) {
             return true;
         }
-        else{
-            return false;
-        }
+        //if canJumpTo leftId or rightId return true
+        
     }
     
-    function isPossibleSquareOnBoard(possibleNum) {
-        if(possibleNum.charAt(0) >= 0 && possibleNum.charAt(0) < 8 && possibleNum.charAt(1) < 8) {
-            return true;
-        }
+    function isPossibleSquareOnBoard(targetId) {
+        return targetId.charAt(0) >= 0 && targetId.charAt(0) < 8 && targetId.charAt(1) < 8;
     }
     
-    function enemyPiece(possibleNum, enemyColor) {
-        if($('#' + possibleNum).hasClass(enemyColor + "-checker-img")){
-            return true;
-        }
+    function isEnemyPiece(targetId, enemyColor) {
+        return $('#' + targetId).hasClass(enemyColor + "-checker-img");            
     }
     
-    function isBlankSquare(possibleNum, enemyColor) {
-        if(!$('#' + possibleNum).hasClass(turn + "-checker-img") && !$('#' + possibleNum).hasClass(enemyColor + "-checker-img")) {
-            return true;
-        }
+    function wouldJumpEnemy(clickedId, targetId, enemyColor) {
+        var inBetween = (parseInt(clickedId + targetId)/2).toString();
+        return isEnemyPiece(inBetween, enemyColor);
+        
     }
     
-    function twoCharacterId(num) {
-        var stringToNum = +num;
-        if(stringToNum.length === 1){
-            stringToNum = '0' + stringToNum;
+    function isBlankSquare(targetId, enemyColor) {
+        return !$('#' + targetId).hasClass(turn + "-checker-img") && !$('#' + targetId).hasClass(enemyColor + "-checker-img");
+    }
+//    function canJumpTo(targetId,originId)     
+    function canJumpTo(targetId, enemyColor){
+        return isValidSquare(targetId, enemyColor) && wouldJumpEnemy(targetId, enemyColor);
+        //return true if isValidSquare and has an inbetween enemy
+    }
+    
+    function isValidSquare(targetId, enemyColor){
+        return (isBlankSquare(targetId, enemyColor) && isPossibleSquareOnBoard(targetId)); 
+    }
+    
+    function twoCharacterId(id) {
+        if(typeof id === 'number') id = id.toString();
+        if(id.length === 1){
+            id = '0' + id;
         }
-        return '' + stringToNum;
+        return id;
     }
     
     function slide(elId) {
@@ -215,58 +180,54 @@ $(document).ready(function(){
         $('#container').find('.highlight').removeClass(turn + '-checker-img highlight');
     }
 
-    function canCheckerMoveHere(elId, enemyColor){
+    function canSlideHere(elId, enemyColor) {
         var cell = $("#" + elId);
-        var valid = validMove(elId, cell, enemyColor);
-        return valid;
+        var possibilities = generatePossibilities(elId);
+        return !$(cell).hasClass(turn + "-checker-img") &&
+                ($("#"+possibilities[turn].slideLeft).hasClass("highlight") === true || $("#"+possibilities[turn].slideRight).hasClass("highlight"));
     }
     
-    function validMove(elId, cellEl, enemyColor){
-        var negativeEleven = parseInt(elId - 11);
-        var possibleEleven = negativeEleven.toString();
-        var negativeNine = parseInt(+elId - 9);
-        var possibleNine = negativeNine.toString();
-        var blackEighteen = parseInt(+elId - 18).toString();
-        var blackTwentyTwo = parseInt(+elId - 22).toString();
-        var positiveEleven = parseInt(+elId + 11);
-        var redEleven = positiveEleven.toString();
-        var positiveNine = parseInt(+elId + 9);
-        var redNine = positiveNine.toString();
-        var redEighteen = parseInt(+elId + 18).toString();
-        var redTwentyTwo = parseInt(+elId + 22).toString();
-        var possibilities = {
-            blackEleven: possibleEleven,
-            blackNine: possibleNine,
-            black18: blackEighteen,
-            black22: blackTwentyTwo,
-            redEleven: redEleven,
-            redNine: redNine,
-            red18: redEighteen,
-            red22: redTwentyTwo
-        }
-        if(turn === "black") {
-            return validation(cellEl, possibilities, enemyColor); 
-        }else if(turn === "red"){
-            return validation(cellEl, possibilities, enemyColor);
-        }
+    function generatePossibilities(id) {
+        return {
+            black: {
+                slideLeft: twoCharacterId((+id - 11).toString()),
+                slideRight: twoCharacterId((+id - 9).toString()),
+                jumpRight: twoCharacterId((+id - 18).toString()),
+                jumpLeft: twoCharacterId((+id - 22).toString())
+            },
+            red: {
+                slideRight: twoCharacterId((+id + 11).toString()),
+                slideLeft: twoCharacterId((+id + 9).toString()),
+                jumpLeft: twoCharacterId((+id + 18).toString()),
+                jumpRight: twoCharacterId((+id + 22).toString())
+            }
+        };
     }
     
-    function validation(clickedCell, objPoss, enemyColor) {
-        if($(clickedCell).hasClass(turn + "-checker-img") != true &&
-            $("#"+objPoss[turn+"Eleven"]).hasClass("highlight") === true || $("#"+objPoss[turn+"Nine"]).hasClass("highlight")){
-            return "slide";
-        }else if($(clickedCell).hasClass(turn + "-checker-img") === true) {
-            return false;
-        }else if($(clickedCell).hasClass(turn + "-checker-img") != true && $("#"+objPoss[turn+"18"]).hasClass("highlight") === true && $("#"+objPoss[turn+"Nine"]).hasClass(enemyColor + "-checker-img") === true) {
-            return enemyColor;         
-        }else if($(clickedCell).hasClass(turn + "-checker-img") != true && $("#"+objPoss[turn + "22"]).hasClass("highlight") === true && $("#"+objPoss[turn + "Eleven"]).hasClass(enemyColor + "-checker-img") === true) {
-            return enemyColor;         
-        }else if($(clickedCell).hasClass(turn + "-checker-img") != true && ($("#"+objPoss[turn+"Eleven"]).hasClass("highlight") != true && $("#"+objPoss[turn+"Eleven"]).hasClass(turn + "-checker-img") || $("#"+objPoss[turn+"Nine"]).hasClass("highlight") != true && $("#"+objPoss[turn+"Nine"]).hasClass(turn + "-checker-img") != true)) {
-            return false;
-        }
+//    function validMove(elId, cellEl, enemyColor){
+//        var possibilities = generatePossibilities(elId);
+//        return validation(cellEl, possibilities, enemyColor);
+//    }
+//        
+//    function validation(clickedCell, objPoss, enemyColor) {
+//        if($(clickedCell).hasClass(turn + "-checker-img") != true &&
+//            $("#"+objPoss[turn].slideLeft).hasClass("highlight") === true || $("#"+objPoss[turn].slideRight).hasClass("highlight")){
+//            return "slide";
+//        }else if(canCheckerJump(clickedCell, objPoss, enemyColor)) {
+//            return enemyColor;         
+//        }
+//        return false;
+//    }
+    
+    function canCheckerJump(clickedCell, objPoss, enemyColor) {
+        return canCheckerJumpHere(clickedCell,objPoss,enemyColor,'Right') || canCheckerJumpHere(clickedCell,objPoss,enemyColor,'Left');
     }
     
-    function colorTurn() {
+    function canCheckerJumpHere(clickedCell,objPoss,enemyColor,dir) {
+        return $(clickedCell).hasClass(turn + "-checker-img") != true && $("#"+objPoss[turn]['jump' + dir]).hasClass("highlight") === true && $("#"+objPoss[turn]['slide' + dir]).hasClass(enemyColor + "-checker-img") === true;
+    }
+    
+    function endTurn() {
         if(turn === "black") {
             turn = "red";
         }else if(turn === "red") {
