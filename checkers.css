@@ -33,3 +33,19 @@
 .highlight{
     background-color: aquamarine;
 }
+.red-checker-img.king{
+    height: 10vw;
+    width: 10vw;
+    background-image: url('images/king-red.gif');
+    background-size: cover;            
+    background-repeat: no-repeat;
+    background-position: center center; 
+}
+.black-checker-img.king{
+    height: 10vw;
+    width: 10vw;
+    background-image: url('images/king-black.gif');
+    background-size: cover;            
+    background-repeat: no-repeat;
+    background-position: center center; 
+}
