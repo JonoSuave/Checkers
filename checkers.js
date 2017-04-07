@@ -133,15 +133,11 @@ $(document).ready(function(){
         
     }
     
-    function isEnemyPiece(targetId, enemyColor) {
-        return $('#' + targetId).hasClass(enemyColor + "-checker-img");            
+    function slide(elId) {
+        var cell = $("#" + elId);
+        $(cell).addClass(turn + "-checker-img"); $('#container').find('.highlight').removeClass(turn + '-checker-img highlight');
     }
     
-    function wouldJumpEnemy(targetId, clickedId, enemyColor) {
-        var inBetween = (parseInt(+clickedId + (+targetId))/2).toString();
-        return isEnemyPiece(inBetween, enemyColor);
-        
-    }
     
 //    function canJumpTo(targetId,originId)     
     function canJumpTo(targetId, clickedId, enemyColor){
@@ -161,17 +157,22 @@ $(document).ready(function(){
         return targetId.charAt(0) >= 0 && targetId.charAt(0) < 8 && targetId.charAt(1) < 8;
     }
     
+    function isEnemyPiece(targetId, enemyColor) {
+        return $('#' + targetId).hasClass(enemyColor + "-checker-img");            
+    }
+
+    function wouldJumpEnemy(targetId, clickedId, enemyColor) {
+        var inBetween = (parseInt(+clickedId + (+targetId))/2).toString();
+        return isEnemyPiece(inBetween, enemyColor);
+
+    }
+    
     function twoCharacterId(id) {
         if(typeof id === 'number') id = id.toString();
         if(id.length === 1){
             id = '0' + id;
         }
         return id;
-    }
-    
-    function slide(elId) {
-        var cell = $("#" + elId);
-        $(cell).addClass(turn + "-checker-img"); $('#container').find('.highlight').removeClass(turn + '-checker-img highlight');
     }
     
     function makeCheckerKing(id) {
