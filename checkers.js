@@ -84,6 +84,7 @@ $(document).ready(function(){
     createCheckerSquares();
     var turn = "black";
     var firstActive = false;
+    var kingPieceActive = false;
 
     $('.cell').click(function(){
         var id = $(this).attr('id');
@@ -96,6 +97,9 @@ $(document).ready(function(){
         if(!firstActive) {
             firstActive = true;
             $("#"+id).addClass('highlight');
+            if ($("#" + id).hasClass('king')) {
+                kingPieceActive = true;
+            }
         } else if(firstActive) {
             
             if (canSlideHere(id, enemyColor)) {
@@ -103,6 +107,7 @@ $(document).ready(function(){
                 firstActive = false;
                 makeCheckerKing(id);
                 endTurn();
+                kingPieceActive = false;
             } else if(canCheckerJump($("#" + id), generatePossibilities(id), enemyColor)) {
                 jumpEnemy(id, enemyColor);
                 firstActive = false;
@@ -135,11 +140,14 @@ $(document).ready(function(){
     
     function slide(elId) {
         var cell = $("#" + elId);
-        $(cell).addClass(turn + "-checker-img"); $('#container').find('.highlight').removeClass(turn + '-checker-img highlight');
+        if (kingPieceActive) {
+            $(cell).addClass(turn + "-checker-img king");
+        } else {
+            $(cell).addClass(turn + "-checker-img");
+        }
+         $('#container').find('.highlight').removeClass(turn + '-checker-img highlight');
     }
-    
-    
-//    function canJumpTo(targetId,originId)     
+       
     function canJumpTo(targetId, clickedId, enemyColor){
         return isValidSquare(targetId, enemyColor) && wouldJumpEnemy(targetId, clickedId, enemyColor);
         //return true if isValidSquare and has an inbetween enemy
@@ -180,9 +188,6 @@ $(document).ready(function(){
         if(num < 8 || num >= 70) {
             $("#" + id).addClass("king");
         }
-//        *See if id is < 8 or >= 70
-//        If so, add class king
-//        In css make .red-checker-img .king red Checker king image
     }
     
     function jumpEnemy(elId, enemyColor) {
@@ -197,8 +202,8 @@ $(document).ready(function(){
     function canSlideHere(elId, enemyColor) {
         var cell = $("#" + elId);
         var possibilities = generatePossibilities(elId);
-        return !$(cell).hasClass(turn + "-checker-img") &&
-                ($("#"+possibilities[turn].slideLeft).hasClass("highlight") === true || $("#"+possibilities[turn].slideRight).hasClass("highlight"));
+        return (!$(cell).hasClass(turn + "-checker-img") &&
+            ($("#"+possibilities[turn].slideLeft).hasClass("highlight") || $("#"+possibilities[turn].slideRight).hasClass("highlight"))) || (kingPieceActive && ($("#"+possibilities[enemyColor].slideLeft).hasClass("highlight") || $("#"+possibilities[enemyColor].slideRight).hasClass("highlight")));
     }
     
     function generatePossibilities(id) {
