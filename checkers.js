@@ -126,20 +126,6 @@ $(document).ready(function(){
         return firstActive;
     }
     
-    function canJumpAgain(clickedId, enemyColor) {
-        var elementClicked = $("#" + clickedId);
-        var leftId = turn === 'black' ? twoCharacterId(+clickedId + 22) : twoCharacterId(+clickedId - 18);
-        var rightId = turn === 'black' ? twoCharacterId(+clickedId + 18) : twoCharacterId(+clickedId - 22);
-        
-        if(canJumpTo(leftId, clickedId, enemyColor)) {
-            return true;
-        }else if(canJumpTo(rightId, clickedId, enemyColor)) {
-            return true;
-        }
-        //if canJumpTo leftId or rightId return true
-        
-    }
-    
     function slide(elId) {
         var cell = $("#" + elId);
         if (kingPieceActive) {
@@ -147,7 +133,21 @@ $(document).ready(function(){
         } else {
             $(cell).addClass(turn + "-checker-img");
         }
-         $('#container').find('.highlight').removeClass(turn + '-checker-img highlight');
+        $('#container').find('.highlight').removeClass(turn + '-checker-img highlight');
+    }
+    
+    function canJumpAgain(clickedId, enemyColor) {
+        var elementClicked = $("#" + clickedId);
+//        var leftId = turn === 'black' ? twoCharacterId(+clickedId + 22) : twoCharacterId(+clickedId - 18);
+//        var rightId = turn === 'black' ? twoCharacterId(+clickedId + 18) : twoCharacterId(+clickedId - 22);
+        var possibilities = generatePossibilities(clickedId);
+        if(canJumpTo(possibilities[enemyColor]['jumpRight'], clickedId, enemyColor) || canJumpTo(possibilities[enemyColor]['jumpLeft'], clickedId, enemyColor)) {
+            return true;
+        }else if (kingPieceActive) {
+            return canJumpTo(possibilities[enemyColor]['jumpRight'], clickedId, enemyColor) || canJumpTo(possibilities[enemyColor]['jumpLeft'], clickedId, enemyColor) || canJumpTo(possibilities[turn]['jumpRight'], clickedId, enemyColor) || canJumpTo(possibilities[turn]['jumpLeft'], clickedId, enemyColor)
+        }
+        //if canJumpTo leftId or rightId return true
+        
     }
        
     function canJumpTo(targetId, clickedId, enemyColor){
