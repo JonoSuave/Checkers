@@ -113,6 +113,7 @@ $(document).ready(function(){
                 firstActive = false;
                 makeCheckerKing(id);
                 if(!canJumpAgain(id, enemyColor)){
+                    kingPieceActive = false;
                     endTurn();
                 }
             }
@@ -129,6 +130,7 @@ $(document).ready(function(){
         var elementClicked = $("#" + clickedId);
         var leftId = turn === 'black' ? twoCharacterId(+clickedId + 22) : twoCharacterId(+clickedId - 18);
         var rightId = turn === 'black' ? twoCharacterId(+clickedId + 18) : twoCharacterId(+clickedId - 22);
+        
         if(canJumpTo(leftId, clickedId, enemyColor)) {
             return true;
         }else if(canJumpTo(rightId, clickedId, enemyColor)) {
@@ -194,9 +196,10 @@ $(document).ready(function(){
         var cell = $("#" + elId);
         var hightlight = $('#container').find('.highlight').attr('id');
         var between = parseInt((+elId + +hightlight)/2).toString();
+        kingPieceActive ? $(cell).addClass(turn + "-checker-img king") :  $(cell).addClass(turn + "-checker-img");
         $(cell).addClass(turn + "-checker-img");
         $('#'+between).removeClass(enemyColor + "-checker-img");
-        $('#container').find('.highlight').removeClass(turn + '-checker-img highlight');
+        $('#container').find('.highlight').removeClass(turn + '-checker-img highlight king');
     }
 
     function canSlideHere(elId, enemyColor) {
@@ -227,7 +230,12 @@ $(document).ready(function(){
     }
     
     function canCheckerJumpHere(clickedCell,objPoss,enemyColor,dir) {
-        return $(clickedCell).hasClass(turn + "-checker-img") != true && $("#"+objPoss[turn]['jump' + dir]).hasClass("highlight") === true && $("#"+objPoss[turn]['slide' + dir]).hasClass(enemyColor + "-checker-img") === true;
+        if (kingPieceActive){
+            return !$(clickedCell).hasClass(turn + "-checker-img") && ($("#"+objPoss[turn]['jump' + dir]).hasClass("highlight") || $("#"+objPoss[enemyColor]['jump' + dir]).hasClass("highlight")) && ($("#"+objPoss[turn]['slide' + dir]).hasClass(enemyColor + "-checker-img") || $("#"+objPoss[enemyColor]['slide' + dir]).hasClass(enemyColor + "-checker-img"));
+        } else {
+            return !$(clickedCell).hasClass(turn + "-checker-img") && $("#"+objPoss[turn]['jump' + dir]).hasClass("highlight") && $("#"+objPoss[turn]['slide' + dir]).hasClass(enemyColor + "-checker-img")
+        }
+        
     }
     
     function endTurn() {

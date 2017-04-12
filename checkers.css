@@ -9,13 +9,13 @@
     width: 80vw;
 }
 .cell{
-    height: 10vw;
-    width: 10vw;
+    height: 7vw;
+    width: 7vw;
     display: inline-block;
 }
 .black-checker-img{
-    height: 10vw;
-    width: 10vw;
+    height: 7vw;
+    width: 7vw;
     background-image: url('images/black.png');
     background-size: cover;            
     background-repeat: no-repeat;
@@ -23,8 +23,8 @@
     
 }
 .red-checker-img{
-    height: 10vw;
-    width: 10vw;
+    height: 7vw;
+    width: 7vw;
     background-image: url('images/red.png');
     background-size: cover;            
     background-repeat: no-repeat;
@@ -34,16 +34,16 @@
     background-color: aquamarine;
 }
 .red-checker-img.king{
-    height: 10vw;
-    width: 10vw;
+    height: 7vw;
+    width: 7vw;
     background-image: url('images/king-red.gif');
     background-size: cover;            
     background-repeat: no-repeat;
     background-position: center center; 
 }
 .black-checker-img.king{
-    height: 10vw;
-    width: 10vw;
+    height: 7vw;
+    width: 7vw;
     background-image: url('images/king-black.gif');
     background-size: cover;            
     background-repeat: no-repeat;
