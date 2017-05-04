@@ -49,11 +49,6 @@ function pieceBuilder(i){
 function makeCheckerImg(i,woo){
     if(i<3){
         var blackCheckerImg = $(woo).addClass('black-checker-img');
-//            $("<img />").attr("src","images/black.png");
-//        $(blackCheckerImg).addClass('img-size');
-//       $(woo).append(blackCheckerImg); 
-        
-        
     }else if (i>4){
         var redCheckerImg = $(woo).addClass('red-checker-img'); 
     }
@@ -85,6 +80,8 @@ $(document).ready(function(){
     var turn = "black";
     var firstActive = false;
     var kingPieceActive = false;
+    var highlightedCellId; 
+    var keepCheckerHighlighted = false;
 
     $('.cell').click(function(){
         var id = $(this).attr('id');
@@ -97,6 +94,7 @@ $(document).ready(function(){
         if(!firstActive) {
             firstActive = true;
             $("#"+id).addClass('highlight');
+            highlightedCellId = $("#" + id).attr('id');
             if ($("#" + id).hasClass('king')) {
                 kingPieceActive = true;
             }
@@ -115,14 +113,18 @@ $(document).ready(function(){
                 if(!canJumpAgain(id, enemyColor)){
                     endTurn();
                 }
+                keepCheckerHighlighted = true;
             }
             else {  
                 alert("No can do-ey mate");               $('#container').find('.highlight').removeClass('highlight');
                 firstActive = false;
+                kingPieceActive = false;
                 //what to do if they can't move
             }
         }
-        return firstActive;
+        if (keepCheckerHighlighted = false) {
+            return firstActive;
+        }
     }
     
     function slide(elId) {
@@ -132,7 +134,7 @@ $(document).ready(function(){
         } else {
             $(cell).addClass(turn + "-checker-img");
         }
-        $('#container').find('.highlight').removeClass(turn + '-checker-img highlight');
+        $('#container').find('.highlight').removeClass(turn + '-checker-img highlight king');
     }
     
     function canJumpAgain(clickedId, enemyColor) {
@@ -155,14 +157,7 @@ $(document).ready(function(){
         }else {
             return canJumpTo(leftId, clickedId, enemyColor) || canJumpTo(rightId, clickedId, enemyColor);
         }
-//        var possibilities = generatePossibilities(clickedId);
-//        if(canJumpTo(possibilities[enemyColor]['jumpRight'], clickedId, enemyColor) || canJumpTo(possibilities[enemyColor]['jumpLeft'], clickedId, enemyColor)) {
-//            return true;
-//        }else if (kingPieceActive) {
-//            return canJumpTo(possibilities[enemyColor]['jumpRight'], clickedId, enemyColor) || canJumpTo(possibilities[enemyColor]['jumpLeft'], clickedId, enemyColor) || canJumpTo(possibilities[turn]['jumpRight'], clickedId, enemyColor) || canJumpTo(possibilities[turn]['jumpLeft'], clickedId, enemyColor)
-//        }
-        //if canJumpTo leftId or rightId return true
-        
+
     }
        
     function canJumpTo(targetId, clickedId, enemyColor){
@@ -171,11 +166,11 @@ $(document).ready(function(){
     }
     
     function isValidSquare(targetId, enemyColor){
-        return (isBlankSquare(targetId, enemyColor) && isPossibleSquareOnBoard(targetId)); 
+        return (isBlankSquare($('#' + targetId), enemyColor) && isPossibleSquareOnBoard(targetId)); 
     }
     
     function isBlankSquare(targetId) {
-        return !$('#' + targetId).hasClass("red-checker-img") && !$('#' + targetId).hasClass("black-checker-img");
+        return !targetId.hasClass("red-checker-img") && !targetId.hasClass("black-checker-img");
     }
     
     function isPossibleSquareOnBoard(targetId) {
@@ -218,7 +213,9 @@ $(document).ready(function(){
         var hightlight = $('#container').find('.highlight').attr('id');
         var between = parseInt((+elId + +hightlight)/2).toString();
         if (kingPieceActive) {
-            $(cell).addClass(turn + "-checker-img king")
+            $(cell).addClass(turn + "-checker-img king");
+            $('#'+between).removeClass(enemyColor + "-checker-img");
+            $('#container').find('.highlight').removeClass(turn + '-checker-img highlight king');
         }
         $(cell).addClass(turn + "-checker-img");
         $('#'+between).removeClass(enemyColor + "-checker-img");
@@ -228,27 +225,25 @@ $(document).ready(function(){
     function canSlideHere(elId, enemyColor) {
         var cell = $("#" + elId);
         var possibilities = generatePossibilities(elId);
-//        return (!$(cell).hasClass(turn + "-checker-img") &&
-//                ($("#"+possibilities[turn].slideLeft).hasClass(turn + "-checker-img highlight") || $("#"+possibilities[turn].slideRight).hasClass(turn + "-checker-img highlight"))) || (kingPieceActive && ($("#"+possibilities[enemyColor].slideLeft).hasClass(turn + "-checker-img highlight") || $("#"+possibilities[enemyColor].slideRight).hasClass(turn + "-checker-img highlight")));
-        return isValidSquare(elId) && isValidSlide(elId,possibilities,enemyColor);
+        return isValidSquare(elId) && isValidSlide(elId,possibilities,enemyColor, cell);
     }
     
-    function isValidSlide(id,possibilities, enemyColor){
+    function isValidSlide(id,possibilities, enemyColor, cell){
         var validMoves = {
             black: {
-                left:$("#"+possibilities.black.slideLeft).hasClass("black-checker-img highlight"),
-                right:$("#"+possibilities.black.slideRight).hasClass("black-checker-img highlight")
+                left:$("#"+possibilities.black.slideLeft).is("." + turn + "-checker-img.highlight"),
+                right:$("#"+possibilities.black.slideRight).is("." + turn + "-checker-img.highlight")
             },
             red:{
-                left:$("#"+possibilities.red.slideLeft).hasClass("red-checker-img highlight"),
-                right:$("#"+possibilities.red.slideRight).hasClass("red-checker-img highlight")
+                left:$("#"+possibilities.red.slideLeft).is("." + turn + "-checker-img.highlight"),
+                right:$("#"+possibilities.red.slideRight).is("." + turn + "-checker-img.highlight")
             }
         };
         if(kingPieceActive){
             return (validMoves.black.left || validMoves.black.right || validMoves.red.left || validMoves.red.right); 
         }
         else{
-            return (validMoves[turn].left || validMoves[turn].right);
+            return (validMoves[turn].left || validMoves[turn].right) && (!$(cell).hasClass("black-checker-img") || !$(cell).hasClass("red-checker-img"));
         }
     }
     
@@ -273,13 +268,17 @@ $(document).ready(function(){
     }
     
     function canCheckerJumpHere(clickedCell,objPoss,enemyColor,dir) {
+        var clickedCellId = $(clickedCell).attr('id');
         if (kingPieceActive){
-            return !$(clickedCell).hasClass(turn + "-checker-img") && ($("#"+objPoss[turn]['jump' + dir]).hasClass("highlight") || $("#"+objPoss[enemyColor]['jump' + dir]).hasClass("highlight")) && ($("#"+objPoss[turn]['slide' + dir]).hasClass(enemyColor + "-checker-img") || $("#"+objPoss[enemyColor]['slide' + dir]).hasClass(enemyColor + "-checker-img"));
+            return !$(clickedCell).hasClass(turn + "-checker-img") && ($("#"+objPoss[turn]['jump' + dir]).hasClass("highlight") || $("#"+objPoss[enemyColor]['jump' + dir]).hasClass("highlight")) && (wouldJumpEnemy(highlightedCellId, clickedCellId, enemyColor) || wouldJumpEnemy(highlightedCellId, clickedCellId, enemyColor));
         } else {
-            return !$(clickedCell).hasClass(turn + "-checker-img") && $("#"+objPoss[turn]['jump' + dir]).hasClass("highlight") && $("#"+objPoss[turn]['slide' + dir]).hasClass(enemyColor + "-checker-img")
-        }
-        
+            return isBlankSquare(clickedCell) && $("#"+objPoss[turn]['jump' + dir]).hasClass("highlight") && $("#"+objPoss[turn]['slide' + dir]).hasClass(enemyColor + "-checker-img")
+        }    
     }
+    
+//    function checkCanCheckerJumpHereEnemyPiece(objPoss, enemyColor, dir) {
+//        $("#"+objPoss[turn]['slide' + dir]).hasClass(enemyColor + "-checker-img") && $("#" + ) || $("#"+objPoss[enemyColor]['slide' + dir]).hasClass(enemyColor + "-checker-img")
+//    }
     
     function endTurn() {
         kingPieceActive = false;
@@ -288,6 +287,7 @@ $(document).ready(function(){
         }else if(turn === "red") {
             turn = "black"; 
         }
+        keepCheckerHighlighted = false;
         return turn
     }
 });
